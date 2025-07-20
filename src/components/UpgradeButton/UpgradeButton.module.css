@@ -1,0 +1,32 @@
+.upgradeButton {
+  margin: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.25s ease-in-out;
+  text-decoration: none;
+  border: none;
+  font-family: inherit;
+}
+
+.upgradeButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+.upgradeButtonIcon {
+  margin-right: 8px;
+  filter: brightness(0) invert(1);
+}
+
+.upgradeButtonText {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}

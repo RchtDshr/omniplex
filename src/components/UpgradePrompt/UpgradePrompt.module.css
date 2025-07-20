@@ -1,0 +1,84 @@
+.upgradePrompt {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  color: white;
+  text-align: center;
+}
+
+.upgradeTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.upgradeDescription {
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.upgradeActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.upgradeButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.upgradeButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.primaryButton {
+  background: white;
+  color: #667eea;
+  border-color: white;
+}
+
+.primaryButton:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.featureItem {
+  margin: 0.5rem 0;
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .upgradePrompt {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .upgradeActions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .upgradeButton {
+    padding: 0.875rem 1.25rem;
+  }
+}

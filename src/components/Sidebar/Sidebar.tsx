@@ -9,6 +9,7 @@ import Plugins from "../Plugins/Plugins";
 import Profile from "../Profile/Profile";
 import Settings from "../Settings/Settings";
 import Auth from "../Auth/Auth";
+import UpgradeButton from "../UpgradeButton/UpgradeButton";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/store/authSlice";
@@ -124,6 +125,7 @@ const Sidebar = () => {
           />
           <p className={styles.titleButtonText}>New Chat</p>
         </div>
+        <UpgradeButton isSidebarOpen={isSidebarOpen} />
       </div>
       {isSidebarOpen && (
         <>

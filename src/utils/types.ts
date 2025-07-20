@@ -153,3 +153,34 @@ export type LibraryItem = {
   url: string;
   date: string;
 };
+
+// Stripe Types
+export type PricingPlan = {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year';
+  features: string[];
+  popular?: boolean;
+  stripePriceId: string;
+};
+
+export type SubscriptionStatus = 'active' | 'canceled' | 'incomplete' | 'trialing' | 'past_due';
+
+export type UserSubscription = {
+  id: string;
+  status: SubscriptionStatus;
+  priceId: string;
+  planName: string;
+  currentPeriodEnd: number;
+  cancelAtPeriodEnd: boolean;
+};
+
+export type PaymentIntent = {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  clientSecret: string;
+};
