@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
+import { useDisclosure } from '@nextui-org/modal';
 import { getStripe, pricingPlans, formatPrice } from '@/utils/stripe';
 import { selectSubscriptionState, selectAuthState, selectUserDetailsState } from '@/store/authSlice';
+import Auth from '../Auth/Auth';
 import styles from './Pricing.module.css';
 
 interface PricingProps {
@@ -17,6 +19,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
   const [showCancelMessage, setShowCancelMessage] = useState(false);
   const [serverSubscription, setServerSubscription] = useState(null);
   const searchParams = useSearchParams();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   
   // Get state from Redux
   const isLoggedIn = useSelector(selectAuthState);
@@ -57,9 +60,9 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
   const handleSubscribe = async (priceId: string, planId: string) => {
     if (planId === 'free') return;
     
-    // Prevent subscription if user is not logged in
+    // Open auth modal if user is not logged in
     if (!isLoggedIn) {
-      alert('Please log in to subscribe to a plan.');
+      onOpen();
       return;
     }
 
@@ -132,9 +135,14 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
   };
 
   const getButtonText = (planId: string) => {
+    // If user is not logged in, show sign in message for paid plans
+    if (!isLoggedIn && planId !== 'free') {
+      return 'Sign in to Upgrade';
+    }
+    
     const currentSubscription = serverSubscription || subscription;
     
-    if (planId === 'free') return 'Current Plan';
+    if (planId === 'free') return isLoggedIn ? 'Current Plan' : 'Get Started';
     if (userCurrentPlan === planId) return 'Current Plan';
     if (currentSubscription?.isActive && currentSubscription?.plan === planId) return 'Active';
     if (planId === 'pro') return 'Upgrade to Pro';
@@ -146,7 +154,43 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
     return userCurrentPlan === planId || (currentSubscription?.isActive && currentSubscription?.plan === planId);
   };
   
-  const isDisabled = (planId: string) => isCurrentPlan(planId) || loading !== null || (!isLoggedIn && planId !== 'free');
+  const isDisabled = (planId: string) => {
+    // Don't disable buttons for non-logged-in users - let them click to sign in
+    if (!isLoggedIn) {
+      return false;
+    }
+    
+    // For logged-in users, disable if it's their current plan or if loading
+    return isCurrentPlan(planId) || loading !== null;
+  };
+
+  // Filter plans based on user's subscription status
+  const getDisplayPlans = () => {
+    if (!isLoggedIn) {
+      // Show all plans for non-logged-in users
+      return pricingPlans;
+    }
+
+    const currentSubscription = serverSubscription || subscription;
+    
+    // If user has an active subscription
+    if (currentSubscription?.isActive) {
+      const currentPlan = currentSubscription.plan;
+      
+      if (currentPlan === 'pro') {
+        // For pro users, only show pro plan (their current plan)
+        return pricingPlans.filter(plan => plan.id === 'pro');
+      }
+      
+      // For other paid plans, show current plan and higher tiers
+      return pricingPlans.filter(plan => plan.id !== 'free');
+    }
+    
+    // For logged-in users with no active subscription (free users), show all plans
+    return pricingPlans;
+  };
+
+  const displayPlans = getDisplayPlans();
 
   return (
     <div className={styles.container}>
@@ -163,9 +207,13 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
 
       {/* Login Required Message */}
       {!isLoggedIn && (
-        <div className={styles.loginMessage}>
-          🔐 Please log in to subscribe to a premium plan.
-        </div>
+        <button 
+          className={styles.loginMessage}
+          onClick={onOpen}
+          style={{ cursor: 'pointer', border: 'none' }}
+        >
+          🔐 Sign in with Google to upgrade your plan
+        </button>
       )}
 
       {/* Cancellation Message */}
@@ -177,7 +225,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
 
       {/* Pricing Cards */}
       <div className={styles.pricingWrapper}>
-        {pricingPlans.map((plan) => (
+        {displayPlans.map((plan) => (
           <div
             key={plan.id}
             className={`${styles.card} ${plan.popular ? styles.popular : ''}`}
@@ -209,7 +257,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
 
             <button
               className={`${styles.button} ${
-                plan.popular || plan.id === 'enterprise'
+                plan.popular 
                   ? styles.primaryButton
                   : styles.secondaryButton
               }`}
@@ -226,16 +274,9 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
         ))}
       </div>
 
-      {/* Test Card Information */}
-      <div className={styles.testInfo}>
-        <h3 className={styles.testTitle}>
-          🧪 Test Mode - Use Test Card Number
-        </h3>
-        <p className={styles.testText}>
-          <strong>4242 4242 4242 4242</strong><br />
-          Use any valid expiry date, CVC, and postal code for testing.
-        </p>
-      </div>
+      
+      {/* Auth Modal */}
+      <Auth isOpen={isOpen} onClose={onClose} />
     </div>
   );
 }

@@ -2,27 +2,29 @@
 .container {
   min-height: 100vh;
   background-color: #161616;
-  padding: 60px 20px;
+  padding: 40px 20px;
+  /* padding-top: 8rem; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Header Section */
 .header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
   max-width: 600px;
 }
 
 .title {
-  font-size: 3.5rem;
+  font-size: 36px;
   font-weight: 300;
   color: #ffffff;
-  margin-bottom: 20px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  line-height: 40px;
+  letter-spacing: normal;
 }
 
 .highlight {
@@ -33,10 +35,10 @@
 }
 
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Login Message */
@@ -44,21 +46,29 @@
   background-color: #232323;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
-  padding: 16px 24px;
+  padding: 12px 18px;
   color: #ffffff;
-  font-weight: 600;
-  margin-bottom: 40px;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 30px;
   text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loginMessage:hover {
+  background-color: #2a2a2a;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Pricing Cards Container */
 .pricingWrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 30px;
-  max-width: 800px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 700px;
   width: 100%;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 /* Individual Card */
@@ -66,7 +76,7 @@
   background-color: #232323;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
-  padding: 40px 30px;
+  padding: 24px 20px;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -94,31 +104,31 @@
 /* Popular Badge */
 .badge {
   position: absolute;
-  top: -12px;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(45deg, #6366f1, #8b5cf6);
   color: white;
-  padding: 8px 20px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
   box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 /* Card Header */
 .cardHeader {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .planName {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
   color: #ffffff;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .price {
@@ -129,8 +139,8 @@
 }
 
 .amount {
-  font-size: 3rem;
-  font-weight: 900;
+  font-size: 32px;
+  font-weight: 700;
   background: linear-gradient(45deg, #6366f1, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -139,7 +149,7 @@
 }
 
 .interval {
-  font-size: 1rem;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
 }
@@ -148,15 +158,16 @@
 .features {
   list-style: none;
   padding: 0;
-  margin: 0 0 40px 0;
+  margin: 0 0 24px 0;
 }
 
 .feature {
   display: flex;
   align-items: center;
-  padding: 12px 0;
+  padding: 8px 0;
   color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -165,38 +176,38 @@
 }
 
 .checkmark {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: linear-gradient(45deg, #10b981, #059669);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
-  margin-right: 16px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 
 /* Buttons */
 .button {
   width: 100%;
-  padding: 18px 24px;
+  padding: 12px 18px;
   border-radius: 8px;
   border: none;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  text-transform: none;
+  letter-spacing: normal;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 58px;
+  min-height: 44px;
 }
 
 .primaryButton {
@@ -247,36 +258,36 @@
   background-color: #232323;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
-  padding: 24px;
+  padding: 16px;
   text-align: center;
   max-width: 400px;
 }
 
 .testTitle {
   color: #ffffff;
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
 }
 
 .testText {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
+  font-size: 13px;
   margin: 0;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
-    padding: 40px 16px;
+    padding: 30px 16px;
   }
   
   .title {
-    font-size: 2.5rem;
+    font-size: 28px;
   }
   
   .subtitle {
-    font-size: 1.1rem;
+    font-size: 16px;
   }
   
   .pricingWrapper {
@@ -286,7 +297,7 @@
   }
   
   .card {
-    padding: 30px 24px;
+    padding: 20px 16px;
   }
   
   .popular {
@@ -298,25 +309,25 @@
   }
   
   .amount {
-    font-size: 2.5rem;
+    font-size: 28px;
   }
   
   .button {
-    padding: 16px 20px;
-    font-size: 1rem;
+    padding: 12px 16px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
   .title {
-    font-size: 2rem;
+    font-size: 24px;
   }
   
   .card {
-    padding: 24px 20px;
+    padding: 18px 14px;
   }
   
   .amount {
-    font-size: 2rem;
+    font-size: 24px;
   }
 }

@@ -169,11 +169,6 @@ export default function PaymentSuccessPage() {
           </Link>
         </div>
 
-        <div style={styles.testNotice}>
-          <p>
-            <strong>🧪 Test Mode:</strong> This was a test payment. No real money was charged.
-          </p>
-        </div>
       </div>
     </div>
   );
@@ -195,6 +190,7 @@ const styles = {
     textAlign: 'center' as const,
     maxWidth: '500px',
     width: '100%',
+    color: '#111827',
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   },
   successIcon: {
