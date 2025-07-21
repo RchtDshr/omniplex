@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useFeatureAccess } from '@/lib/subscription';
 import styles from './UpgradePrompt.module.css';
 
 interface UpgradePromptProps {
@@ -17,10 +17,10 @@ export default function UpgradePrompt({
   description,
   showFeatures = true 
 }: UpgradePromptProps) {
-  const { hasFeatureAccess, isPremium } = useSubscription();
+  const { hasFeature } = useFeatureAccess();
 
   // Don't show if user has access to the feature
-  if (hasFeatureAccess(feature)) {
+  if (hasFeature(feature)) {
     return null;
   }
 

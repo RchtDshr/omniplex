@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/lib/subscription';
 import styles from './UpgradeButton.module.css';
 
 // You can use any icon - I'll use a simple crown icon placeholder
@@ -16,10 +16,10 @@ interface UpgradeButtonProps {
 }
 
 export default function UpgradeButton({ isSidebarOpen = false }: UpgradeButtonProps) {
-  const { isPremium, getCurrentPlan } = useSubscription();
+  const { isPro, planId } = useSubscription();
   
-  const buttonText = isPremium ? getCurrentPlan().toUpperCase() : 'Upgrade';
-  const buttonStyle = isPremium 
+  const buttonText = isPro ? 'PRO' : 'Upgrade';
+  const buttonStyle = isPro 
     ? { ...baseButtonStyle, background: '#10b981' }
     : { ...baseButtonStyle };
 

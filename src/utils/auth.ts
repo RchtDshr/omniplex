@@ -14,7 +14,7 @@ export interface UserData {
   profilePic: string;
   subscription: {
     isActive: boolean;
-    plan: 'free' | 'pro' | 'enterprise';
+    plan: 'free' | 'pro';
     subscriptionId: string | null;
     currentPeriodEnd: number | null;
   };
@@ -102,7 +102,7 @@ export const updateUserSubscription = async (
   userId: string,
   subscriptionData: {
     isActive: boolean;
-    plan: 'free' | 'pro' | 'enterprise';
+    plan: 'free' | 'pro';
     subscriptionId: string | null;
     currentPeriodEnd: number | null;
   }

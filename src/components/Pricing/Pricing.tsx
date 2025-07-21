@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useSelector } from 'react-redux';
 import { useDisclosure } from '@nextui-org/modal';
-import { getStripe, pricingPlans, formatPrice } from '@/utils/stripe';
-import { selectSubscriptionState, selectAuthState, selectUserDetailsState } from '@/store/authSlice';
+import { getStripe } from '@/utils/stripe';
+import { useSubscription, usePricingPlans, useSubscriptionActions } from '@/lib/subscription';
+import { selectAuthState, selectUserDetailsState } from '@/store/authSlice';
+import { useSelector } from 'react-redux';
 import Auth from '../Auth/Auth';
 import styles from './Pricing.module.css';
 
@@ -21,13 +22,14 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
   const searchParams = useSearchParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
   
-  // Get state from Redux
-  const isLoggedIn = useSelector(selectAuthState);
-  const subscription = useSelector(selectSubscriptionState);
-  const userDetails = useSelector(selectUserDetailsState);
+  // Use modular subscription hooks
+  const subscription = useSubscription();
+  const { plans, getButtonText, isPlanDisabled } = usePricingPlans();
+  const { formatPrice } = useSubscriptionActions();
   
-  // Use Redux state for current plan, fallback to prop
-  const userCurrentPlan = subscription?.plan || currentPlan || 'free';
+  // Get auth state from Redux
+  const isLoggedIn = useSelector(selectAuthState);
+  const userDetails = useSelector(selectUserDetailsState);
 
   useEffect(() => {
     // Check if user was redirected back from cancelled checkout
@@ -66,17 +68,17 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
       return;
     }
 
-    // Check current subscription status from both Redux and server
+    // Check current subscription status
     const currentSubscription = serverSubscription || subscription;
     
     // Prevent multiple subscriptions for the same plan
-    if (currentSubscription?.isActive && currentSubscription?.plan === planId) {
+    if (currentSubscription?.isActive && currentSubscription?.planId === planId) {
       alert('You are already subscribed to this plan!');
       return;
     }
     
-    // Prevent downgrading (optional - you can remove this if you want to allow downgrades)
-    if (currentSubscription?.isActive && currentSubscription?.plan === 'pro' && planId === 'free') {
+    // Prevent downgrading (optional)
+    if (currentSubscription?.isActive && currentSubscription?.planId === 'pro' && planId === 'free') {
       alert('Please cancel your current subscription first.');
       return;
     }
@@ -134,64 +136,6 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
     }
   };
 
-  const getButtonText = (planId: string) => {
-    // If user is not logged in, show sign in message for paid plans
-    if (!isLoggedIn && planId !== 'free') {
-      return 'Sign in to Upgrade';
-    }
-    
-    const currentSubscription = serverSubscription || subscription;
-    
-    if (planId === 'free') return isLoggedIn ? 'Current Plan' : 'Get Started';
-    if (userCurrentPlan === planId) return 'Current Plan';
-    if (currentSubscription?.isActive && currentSubscription?.plan === planId) return 'Active';
-    if (planId === 'pro') return 'Upgrade to Pro';
-    return 'Upgrade to Enterprise';
-  };
-
-  const isCurrentPlan = (planId: string) => {
-    const currentSubscription = serverSubscription || subscription;
-    return userCurrentPlan === planId || (currentSubscription?.isActive && currentSubscription?.plan === planId);
-  };
-  
-  const isDisabled = (planId: string) => {
-    // Don't disable buttons for non-logged-in users - let them click to sign in
-    if (!isLoggedIn) {
-      return false;
-    }
-    
-    // For logged-in users, disable if it's their current plan or if loading
-    return isCurrentPlan(planId) || loading !== null;
-  };
-
-  // Filter plans based on user's subscription status
-  const getDisplayPlans = () => {
-    if (!isLoggedIn) {
-      // Show all plans for non-logged-in users
-      return pricingPlans;
-    }
-
-    const currentSubscription = serverSubscription || subscription;
-    
-    // If user has an active subscription
-    if (currentSubscription?.isActive) {
-      const currentPlan = currentSubscription.plan;
-      
-      if (currentPlan === 'pro') {
-        // For pro users, only show pro plan (their current plan)
-        return pricingPlans.filter(plan => plan.id === 'pro');
-      }
-      
-      // For other paid plans, show current plan and higher tiers
-      return pricingPlans.filter(plan => plan.id !== 'free');
-    }
-    
-    // For logged-in users with no active subscription (free users), show all plans
-    return pricingPlans;
-  };
-
-  const displayPlans = getDisplayPlans();
-
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -225,7 +169,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
 
       {/* Pricing Cards */}
       <div className={styles.pricingWrapper}>
-        {displayPlans.map((plan) => (
+        {plans.map((plan) => (
           <div
             key={plan.id}
             className={`${styles.card} ${plan.popular ? styles.popular : ''}`}
@@ -238,7 +182,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
               <h3 className={styles.planName}>{plan.name}</h3>
               <div className={styles.price}>
                 <span className={styles.amount}>
-                  {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
+                  {formatPrice(plan.price)}
                 </span>
                 {plan.price > 0 && (
                   <span className={styles.interval}>/{plan.interval}</span>
@@ -262,7 +206,7 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
                   : styles.secondaryButton
               }`}
               onClick={() => handleSubscribe(plan.stripePriceId, plan.id)}
-              disabled={isDisabled(plan.id)}
+              disabled={isPlanDisabled(plan.id, loading !== null)}
             >
               {loading === plan.id ? (
                 <span className={styles.spinner}></span>

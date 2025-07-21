@@ -11,7 +11,7 @@ interface AuthState {
   };
   subscription: {
     isActive: boolean;
-    plan: 'free' | 'pro' | 'enterprise';
+    plan: 'free' | 'pro';
     subscriptionId: string | null;
     currentPeriodEnd: number | null;
   };
@@ -55,7 +55,7 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{
         isActive: boolean;
-        plan: 'free' | 'pro' | 'enterprise';
+        plan: 'free' | 'pro';
         subscriptionId: string | null;
         currentPeriodEnd: number | null;
       }>

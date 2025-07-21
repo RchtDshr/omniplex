@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createCheckoutSession, createCheckoutSessionWithProduct } from '@/utils/stripe-server';
-import { getPlanById } from '@/utils/stripe';
+import { SubscriptionService } from '@/lib/subscription';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // If we have a real price ID (not placeholder), use it directly
     if (priceId && priceId !== 'REPLACE_WITH_YOUR_STRIPE_PRICE_ID' && priceId.startsWith('price_')) {
-      const plan = getPlanById(planId);
+      const plan = SubscriptionService.getPlanById(planId);
       session = await createCheckoutSession(
         priceId,
         successUrl,
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     } else {
       // Get plan details for dynamic pricing
-      const plan = getPlanById(planId);
+      const plan = SubscriptionService.getPlanById(planId);
       if (!plan || plan.price === 0) {
         return NextResponse.json(
           { error: 'Invalid plan selected' },
