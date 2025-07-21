@@ -9,6 +9,12 @@ interface AuthState {
     email: string;
     profilePic: string;
   };
+  subscription: {
+    isActive: boolean;
+    plan: 'free' | 'pro' | 'enterprise';
+    subscriptionId: string | null;
+    currentPeriodEnd: number | null;
+  };
 }
 
 const initialState: AuthState = {
@@ -18,6 +24,12 @@ const initialState: AuthState = {
     name: "",
     email: "",
     profilePic: "",
+  },
+  subscription: {
+    isActive: false,
+    plan: 'free',
+    subscriptionId: null,
+    currentPeriodEnd: null,
   },
 };
 
@@ -39,17 +51,30 @@ const authSlice = createSlice({
     ) => {
       state.userDetails = action.payload;
     },
+    setSubscriptionState: (
+      state,
+      action: PayloadAction<{
+        isActive: boolean;
+        plan: 'free' | 'pro' | 'enterprise';
+        subscriptionId: string | null;
+        currentPeriodEnd: number | null;
+      }>
+    ) => {
+      state.subscription = action.payload;
+    },
     resetAuth: () => {
       return initialState;
     },
   },
 });
 
-export const { setAuthState, setUserDetailsState, resetAuth } =
+export const { setAuthState, setUserDetailsState, setSubscriptionState, resetAuth } =
   authSlice.actions;
 
 export const selectAuthState = (state: RootState) => state.auth.authState;
 export const selectUserDetailsState = (state: RootState) =>
   state.auth.userDetails;
+export const selectSubscriptionState = (state: RootState) =>
+  state.auth.subscription;
 
 export default authSlice.reducer;

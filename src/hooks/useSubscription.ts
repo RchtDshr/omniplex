@@ -1,13 +1,20 @@
 import { useSelector } from 'react-redux';
-import { selectSubscription } from '@/store/subscriptionSlice';
-import { selectAuthState } from '@/store/authSlice';
+import { selectAuthState, selectSubscriptionState } from '@/store/authSlice';
 
 export const useSubscription = () => {
-  const subscription = useSelector(selectSubscription);
   const isLoggedIn = useSelector(selectAuthState);
+  const subscription = useSelector(selectSubscriptionState);
 
-  const isPro = subscription?.status === 'active' && subscription?.planName === 'Pro';
-  const isEnterprise = subscription?.status === 'active' && subscription?.planName === 'Enterprise';
+  // Provide default values if subscription is undefined
+  const safeSubscription = subscription || {
+    isActive: false,
+    plan: 'free' as const,
+    subscriptionId: null,
+    currentPeriodEnd: null,
+  };
+
+  const isPro = safeSubscription.isActive && safeSubscription.plan === 'pro';
+  const isEnterprise = safeSubscription.isActive && safeSubscription.plan === 'enterprise';
   const isPremium = isPro || isEnterprise;
 
   const hasFeatureAccess = (feature: string): boolean => {
@@ -35,13 +42,11 @@ export const useSubscription = () => {
 
   const getCurrentPlan = (): string => {
     if (!isLoggedIn) return 'free';
-    if (isEnterprise) return 'enterprise';
-    if (isPro) return 'pro';
-    return 'free';
+    return safeSubscription.plan;
   };
 
   return {
-    subscription,
+    subscription: safeSubscription,
     isPro,
     isEnterprise,
     isPremium,

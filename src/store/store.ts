@@ -13,7 +13,6 @@ import storage from "redux-persist/lib/storage";
 import chatReducer from "./chatSlice";
 import authReducer from "./authSlice";
 import aiReducer from "./aiSlice";
-import subscriptionReducer from "./subscriptionSlice";
 
 // Create a safe storage that only works on client side
 const createNoopStorage = () => {
@@ -36,14 +35,13 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: clientStorage,
-  whitelist: ["chat", "auth", "ai", "subscription"],
+  whitelist: ["chat", "auth", "ai"],
 };
 
 const rootReducer = combineReducers({
   chat: chatReducer,
   auth: authReducer,
   ai: aiReducer,
-  subscription: subscriptionReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

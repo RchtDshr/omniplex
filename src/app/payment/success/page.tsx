@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUserDetailsState, setSubscriptionState } from '@/store/authSlice';
 import Link from 'next/link';
 
 interface PaymentData {
@@ -14,6 +16,8 @@ interface PaymentData {
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
+  const dispatch = useDispatch();
+  const userDetails = useSelector(selectUserDetailsState);
   const sessionId = searchParams.get('session_id');
   const planName = searchParams.get('plan') || 'Pro';
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
@@ -47,15 +51,54 @@ export default function PaymentSuccessPage() {
 
   const fetchPaymentStatus = async () => {
     try {
+      console.log('🔍 Fetching payment status for session:', sessionId);
+      
+      // First get payment status
       const response = await fetch(`/api/stripe/payment-status?session_id=${sessionId}`);
       const data = await response.json();
       
+      console.log('💳 Payment status response:', data);
+      
       if (response.ok) {
         setPaymentData(data);
+        
+        // Then update subscription in Redux if user is logged in
+        if (userDetails.uid && sessionId) {
+          console.log('👤 User details found, updating subscription for:', userDetails.uid);
+          
+          const updateResponse = await fetch('/api/stripe/update-subscription', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sessionId,
+              userId: userDetails.uid,
+            }),
+          });
+          
+          const updateData = await updateResponse.json();
+          console.log('🔄 Update subscription response:', updateData);
+          
+          if (updateResponse.ok) {
+            if (updateData.success && updateData.subscription) {
+              console.log('✅ Updating Redux with subscription:', updateData.subscription);
+              // Update Redux state with subscription info
+              dispatch(setSubscriptionState(updateData.subscription));
+            } else {
+              console.error('❌ Update subscription failed:', updateData);
+            }
+          } else {
+            console.error('❌ Update subscription API error:', updateData);
+          }
+        } else {
+          console.warn('⚠️ No user details or session ID available');
+        }
       } else {
         setError(data.error || 'Failed to fetch payment status');
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error('💥 Network error:', err);
       setError('Network error occurred');
     } finally {
       setLoading(false);

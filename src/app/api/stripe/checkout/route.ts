@@ -17,11 +17,13 @@ export async function POST(request: NextRequest) {
 
     // If we have a real price ID (not placeholder), use it directly
     if (priceId && priceId !== 'REPLACE_WITH_YOUR_STRIPE_PRICE_ID' && priceId.startsWith('price_')) {
+      const plan = getPlanById(planId);
       session = await createCheckoutSession(
         priceId,
         successUrl,
         cancelUrl,
-        userId
+        userId,
+        plan?.name || 'Unknown Plan'
       );
     } else {
       // Get plan details for dynamic pricing

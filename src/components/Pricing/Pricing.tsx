@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { getStripe, pricingPlans, formatPrice } from '@/utils/stripe';
+import { selectSubscriptionState, selectAuthState, selectUserDetailsState } from '@/store/authSlice';
 import styles from './Pricing.module.css';
 
 interface PricingProps {
@@ -10,10 +12,19 @@ interface PricingProps {
   userId?: string;
 }
 
-export default function Pricing({ currentPlan = 'free', userId }: PricingProps) {
+export default function Pricing({ currentPlan, userId }: PricingProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [showCancelMessage, setShowCancelMessage] = useState(false);
+  const [serverSubscription, setServerSubscription] = useState(null);
   const searchParams = useSearchParams();
+  
+  // Get state from Redux
+  const isLoggedIn = useSelector(selectAuthState);
+  const subscription = useSelector(selectSubscriptionState);
+  const userDetails = useSelector(selectUserDetailsState);
+  
+  // Use Redux state for current plan, fallback to prop
+  const userCurrentPlan = subscription?.plan || currentPlan || 'free';
 
   useEffect(() => {
     // Check if user was redirected back from cancelled checkout
@@ -24,8 +35,48 @@ export default function Pricing({ currentPlan = 'free', userId }: PricingProps) 
     }
   }, [searchParams]);
 
+  // Check subscription status from server when user is logged in
+  useEffect(() => {
+    const checkSubscriptionStatus = async () => {
+      if (isLoggedIn && userDetails.uid) {
+        try {
+          const response = await fetch(`/api/stripe/check-subscription?userId=${userDetails.uid}`);
+          if (response.ok) {
+            const data = await response.json();
+            setServerSubscription(data.subscription);
+          }
+        } catch (error) {
+          console.error('Failed to check subscription status:', error);
+        }
+      }
+    };
+
+    checkSubscriptionStatus();
+  }, [isLoggedIn, userDetails.uid]);
+
   const handleSubscribe = async (priceId: string, planId: string) => {
     if (planId === 'free') return;
+    
+    // Prevent subscription if user is not logged in
+    if (!isLoggedIn) {
+      alert('Please log in to subscribe to a plan.');
+      return;
+    }
+
+    // Check current subscription status from both Redux and server
+    const currentSubscription = serverSubscription || subscription;
+    
+    // Prevent multiple subscriptions for the same plan
+    if (currentSubscription?.isActive && currentSubscription?.plan === planId) {
+      alert('You are already subscribed to this plan!');
+      return;
+    }
+    
+    // Prevent downgrading (optional - you can remove this if you want to allow downgrades)
+    if (currentSubscription?.isActive && currentSubscription?.plan === 'pro' && planId === 'free') {
+      alert('Please cancel your current subscription first.');
+      return;
+    }
     
     setLoading(planId);
     
@@ -38,7 +89,7 @@ export default function Pricing({ currentPlan = 'free', userId }: PricingProps) 
         body: JSON.stringify({
           priceId,
           planId,
-          userId,
+          userId: userDetails.uid,
         }),
       });
 
@@ -81,17 +132,32 @@ export default function Pricing({ currentPlan = 'free', userId }: PricingProps) 
   };
 
   const getButtonText = (planId: string) => {
+    const currentSubscription = serverSubscription || subscription;
+    
     if (planId === 'free') return 'Current Plan';
-    if (currentPlan === planId) return 'Current Plan';
+    if (userCurrentPlan === planId) return 'Current Plan';
+    if (currentSubscription?.isActive && currentSubscription?.plan === planId) return 'Active';
     if (planId === 'pro') return 'Upgrade to Pro';
     return 'Upgrade to Enterprise';
   };
 
-  const isCurrentPlan = (planId: string) => currentPlan === planId;
-  const isDisabled = (planId: string) => isCurrentPlan(planId) || loading !== null;
+  const isCurrentPlan = (planId: string) => {
+    const currentSubscription = serverSubscription || subscription;
+    return userCurrentPlan === planId || (currentSubscription?.isActive && currentSubscription?.plan === planId);
+  };
+  
+  const isDisabled = (planId: string) => isCurrentPlan(planId) || loading !== null || (!isLoggedIn && planId !== 'free');
 
   return (
     <div className={styles.pricingContainer}>
+      {/* Login Required Message */}
+      {!isLoggedIn && (
+        <div style={loginRequiredStyles}>
+          <span style={{ marginRight: '0.5rem' }}>🔐</span>
+          Please log in to subscribe to a premium plan.
+        </div>
+      )}
+
       {/* Cancellation Message */}
       {showCancelMessage && (
         <div style={cancelMessageStyles}>
@@ -177,6 +243,19 @@ const cancelMessageStyles = {
   padding: '1rem',
   marginBottom: '2rem',
   color: '#0369a1',
+  textAlign: 'center' as const,
+  fontSize: '0.95rem',
+  fontWeight: '500',
+};
+
+// Styles for login required message
+const loginRequiredStyles = {
+  background: '#fef3c7',
+  border: '1px solid #f59e0b',
+  borderRadius: '8px',
+  padding: '1rem',
+  marginBottom: '2rem',
+  color: '#92400e',
   textAlign: 'center' as const,
   fontSize: '0.95rem',
   fontWeight: '500',

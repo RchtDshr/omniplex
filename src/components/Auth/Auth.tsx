@@ -4,10 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Modal, ModalContent } from "@nextui-org/modal";
 import { useDispatch } from "react-redux";
-import { setAuthState, setUserDetailsState } from "@/store/authSlice";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { setAuthState, setUserDetailsState, setSubscriptionState } from "@/store/authSlice";
+import { signInWithGoogle } from "@/utils/auth";
 import Spinner from "../Spinner/Spinner";
 
 type Props = {
@@ -23,50 +21,25 @@ const Auth = (props: Props) => {
   const handleAuth = async () => {
     setLoading(true);
     try {
-      const auth = getAuth();
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userRef);
-
-      if (userDoc.exists()) {
-        await setDoc(
-          userRef,
-          {
-            userDetails: {
-              email: user.email,
-              name: user.displayName,
-              profilePic: user.photoURL,
-            },
-          },
-          { merge: true }
-        );
-      } else {
-        await setDoc(userRef, {
-          userDetails: {
-            email: user.email,
-            name: user.displayName,
-            profilePic: user.photoURL,
-            createdAt: serverTimestamp(),
-          },
-        });
+      const userData = await signInWithGoogle();
+      
+      if (userData) {
+        // Update Redux state
+        dispatch(setAuthState(true));
+        dispatch(setUserDetailsState({
+          uid: userData.uid,
+          name: userData.name,
+          email: userData.email,
+          profilePic: userData.profilePic,
+        }));
+        dispatch(setSubscriptionState(userData.subscription));
+        
+        props.onClose();
       }
-
-      dispatch(setAuthState(true));
-      dispatch(
-        setUserDetailsState({
-          uid: user.uid,
-          name: user.displayName ?? "",
-          email: user.email ?? "",
-          profilePic: user.photoURL ?? "",
-        })
-      );
-      props.onClose();
-      setLoading(false);
     } catch (error) {
-      console.log("error", error);
+      console.error("Authentication error:", error);
+      alert("Sign in failed. Please try again.");
+    } finally {
       setLoading(false);
     }
   };

@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import AuthStateManager from "@/components/AuthStateManager/AuthStateManager";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,8 +64,10 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={inter.className}>
         <Providers>
-          <Sidebar />
-          {children}
+          <AuthStateManager>
+            <Sidebar />
+            {children}
+          </AuthStateManager>
         </Providers>
       </body>
     </html>

@@ -47,6 +47,12 @@ export const createCheckoutSessionWithProduct = async (
     // Create or get existing price
     const price = await createTestProduct(planName, amount);
     
+    console.log('Creating checkout session with product:', {
+      planName,
+      amount,
+      userId
+    });
+    
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -62,9 +68,11 @@ export const createCheckoutSessionWithProduct = async (
       metadata: {
         userId: userId || '',
         planName: planName,
+        planType: planName.toLowerCase().includes('pro') ? 'pro' : 'free',
       },
     });
 
+    console.log('Checkout session created with metadata:', session.metadata);
     return session;
   } catch (error) {
     console.error('Error creating checkout session with product:', error);
@@ -76,9 +84,16 @@ export const createCheckoutSession = async (
   priceId: string,
   successUrl: string,
   cancelUrl: string,
-  userId?: string
+  userId?: string,
+  planName?: string
 ) => {
   try {
+    console.log('Creating checkout session with existing price:', {
+      priceId,
+      planName,
+      userId
+    });
+    
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -93,9 +108,12 @@ export const createCheckoutSession = async (
       client_reference_id: userId,
       metadata: {
         userId: userId || '',
+        planName: planName || 'Unknown Plan',
+        planType: planName?.toLowerCase().includes('pro') ? 'pro' : 'free',
       },
     });
 
+    console.log('Checkout session created with metadata:', session.metadata);
     return session;
   } catch (error) {
     console.error('Error creating checkout session:', error);
