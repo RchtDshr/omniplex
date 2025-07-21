@@ -149,114 +149,93 @@ export default function Pricing({ currentPlan, userId }: PricingProps) {
   const isDisabled = (planId: string) => isCurrentPlan(planId) || loading !== null || (!isLoggedIn && planId !== 'free');
 
   return (
-    <div className={styles.pricingContainer}>
-      {/* Login Required Message */}
-      {!isLoggedIn && (
-        <div style={loginRequiredStyles}>
-          <span style={{ marginRight: '0.5rem' }}>🔐</span>
-          Please log in to subscribe to a premium plan.
-        </div>
-      )}
-
-      {/* Cancellation Message */}
-      {showCancelMessage && (
-        <div style={cancelMessageStyles}>
-          <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
-          Payment was cancelled. You can try again anytime!
-        </div>
-      )}
-
-      <div className={styles.pricingHeader}>
-        <h1 className={styles.pricingTitle}>Choose Your Plan</h1>
-        <p className={styles.pricingSubtitle}>
+    <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.header}>
+        <h1 className={styles.title}>
+          Choose Your <span className={styles.highlight}>Plan</span>
+        </h1>
+        <p className={styles.subtitle}>
           Unlock the full potential of Omniplex with our flexible pricing plans. 
           Start free and upgrade as you grow.
         </p>
       </div>
 
-      <div className={styles.pricingGrid}>
+      {/* Login Required Message */}
+      {!isLoggedIn && (
+        <div className={styles.loginMessage}>
+          🔐 Please log in to subscribe to a premium plan.
+        </div>
+      )}
+
+      {/* Cancellation Message */}
+      {showCancelMessage && (
+        <div className={styles.loginMessage}>
+          ℹ️ Payment was cancelled. You can try again anytime!
+        </div>
+      )}
+
+      {/* Pricing Cards */}
+      <div className={styles.pricingWrapper}>
         {pricingPlans.map((plan) => (
           <div
             key={plan.id}
-            className={`${styles.pricingCard} ${
-              plan.popular ? styles.popular : ''
-            }`}
+            className={`${styles.card} ${plan.popular ? styles.popular : ''}`}
           >
-            <div className={styles.planName}>{plan.name}</div>
-            <div className={styles.planPrice}>
-              <span className={styles.priceAmount}>
-                {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
-              </span>
-              {plan.price > 0 && (
-                <>
-                  <span className={styles.priceCurrency}></span>
-                  <span className={styles.priceInterval}>/{plan.interval}</span>
-                </>
-              )}
+            {plan.popular && (
+              <div className={styles.badge}>Most Popular</div>
+            )}
+            
+            <div className={styles.cardHeader}>
+              <h3 className={styles.planName}>{plan.name}</h3>
+              <div className={styles.price}>
+                <span className={styles.amount}>
+                  {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
+                </span>
+                {plan.price > 0 && (
+                  <span className={styles.interval}>/{plan.interval}</span>
+                )}
+              </div>
             </div>
 
-            <ul className={styles.featuresList}>
+            <ul className={styles.features}>
               {plan.features.map((feature, index) => (
-                <li key={index} className={styles.featureItem}>
-                  
+                <li key={index} className={styles.feature}>
+                  <span className={styles.checkmark}>✓</span>
                   {feature}
                 </li>
               ))}
             </ul>
 
             <button
-              className={`${styles.ctaButton} ${
+              className={`${styles.button} ${
                 plan.popular || plan.id === 'enterprise'
-                  ? styles.primary
-                  : styles.secondary
+                  ? styles.primaryButton
+                  : styles.secondaryButton
               }`}
               onClick={() => handleSubscribe(plan.stripePriceId, plan.id)}
               disabled={isDisabled(plan.id)}
             >
-              {loading === plan.id ? 'Processing...' : getButtonText(plan.id)}
+              {loading === plan.id ? (
+                <span className={styles.spinner}></span>
+              ) : (
+                getButtonText(plan.id)
+              )}
             </button>
           </div>
         ))}
       </div>
 
       {/* Test Card Information */}
-      <div className={styles.testCardInfo}>
-        <h3 className={styles.testCardTitle}>
+      <div className={styles.testInfo}>
+        <h3 className={styles.testTitle}>
           🧪 Test Mode - Use Test Card Number
         </h3>
-        <div className={styles.testCardNumber}>
-          4242 4242 4242 4242
-        </div>
-        <p style={{ margin: '0.5rem 0 0 0', color: '#92400e', fontSize: '0.875rem' }}>
+        <p className={styles.testText}>
+          <strong>4242 4242 4242 4242</strong><br />
           Use any valid expiry date, CVC, and postal code for testing.
         </p>
       </div>
     </div>
   );
 }
-
-// Styles for cancel message
-const cancelMessageStyles = {
-  background: '#e0f2fe',
-  border: '1px solid #0284c7',
-  borderRadius: '8px',
-  padding: '1rem',
-  marginBottom: '2rem',
-  color: '#0369a1',
-  textAlign: 'center' as const,
-  fontSize: '0.95rem',
-  fontWeight: '500',
-};
-
-// Styles for login required message
-const loginRequiredStyles = {
-  background: '#fef3c7',
-  border: '1px solid #f59e0b',
-  borderRadius: '8px',
-  padding: '1rem',
-  marginBottom: '2rem',
-  color: '#92400e',
-  textAlign: 'center' as const,
-  fontSize: '0.95rem',
-  fontWeight: '500',
-};
