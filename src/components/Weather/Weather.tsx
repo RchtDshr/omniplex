@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import styles from "./Weather.module.css";
 import { WeatherType } from "@/utils/types";
 import { Skeleton } from "@nextui-org/skeleton";
@@ -20,10 +21,12 @@ const Weather = ({ weatherResults }: WeatherProps) => {
               >{`${weatherResults.current.temperature}°C`}</div>
             </div>
             <div className={styles.weatherInfo}>
-              <img
+              <Image
                 src={`http://openweathermap.org/img/wn/${weatherResults.current.icon}@2x.png`}
                 alt="Current Weather Icon"
                 className={styles.weatherIcon}
+                width={64}
+                height={64}
               />
               <div className={styles.weatherCondition}>
                 {weatherResults.current.weather}
@@ -37,10 +40,12 @@ const Weather = ({ weatherResults }: WeatherProps) => {
             {weatherResults.hourly.map((hour, index) => (
               <div className={styles.hourlyItem} key={index}>
                 <div className={styles.hour}>{`${hour.time}`}</div>
-                <img
+                <Image
                   src={`http://openweathermap.org/img/wn/${hour.icon}@2x.png`}
                   alt="Hourly Weather Icon"
                   className={styles.weatherForcastIcon}
+                  width={32}
+                  height={32}
                 />
                 <div className={styles.hourTemp}>{`${hour.temperature}°`}</div>
               </div>

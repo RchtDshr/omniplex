@@ -64,10 +64,13 @@ const Widget = ({ searchResults }: searchProps) => {
               >
                 {images.map((image: any, index: number) => (
                   <SwiperSlide key={index}>
-                    <img
+                    <Image
                       src={image.thumbnailUrl}
                       alt={`Image ${index + 1}`}
                       onClick={() => openInNewWindow(image.hostPageUrl)}
+                      width={300}
+                      height={200}
+                      style={{ cursor: 'pointer' }}
                     />
                   </SwiperSlide>
                 ))}
@@ -121,10 +124,13 @@ const Widget = ({ searchResults }: searchProps) => {
                 {videos.map((video: any, index: number) => (
                   <SwiperSlide key={index}>
                     <div className={styles.videoSlide}>
-                      <img
+                      <Image
                         src={video.thumbnailUrl}
                         alt={`Video ${index + 1}`}
                         onClick={() => openInNewWindow(video.hostPageUrl)}
+                        width={300}
+                        height={200}
+                        style={{ cursor: 'pointer' }}
                       />
                       <div className={styles.playIcon}>
                         <Image src={PlayIcon} alt="Play" />
