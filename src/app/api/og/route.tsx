@@ -44,8 +44,10 @@ export async function GET(request: Request) {
     }
 
     if (!chatThread) {
+      // Using img tag here is intentional for OG image generation
+      // eslint-disable-next-line @next/next/no-img-element
       return new ImageResponse(
-        <img width="1200" height="630" src="https://omniplex.ai/OGImage.png" />,
+        <img width="1200" height="630" src="https://omniplex.ai/OGImage.png" alt="Omniplex AI" />,
         {
           width: 1200,
           height: 630,

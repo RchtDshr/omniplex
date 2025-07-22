@@ -282,11 +282,12 @@ const Chat = (props: Props) => {
     };
 
     processChatThread();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    chatThread?.chats.length,
-    chatThread?.chats[chatThread?.chats.length - 1]?.mode,
-    chatThread?.chats[chatThread?.chats.length - 1]?.searchResults,
-    chatThread?.chats[chatThread?.chats.length - 1]?.answer,
+    chatThread,
+    dispatch,
+    error,
+    id,
   ]);
 
   const handleSearch = async (chatIndex: number) => {

@@ -7,9 +7,6 @@ const requiredEnvVars = [
   'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
   'NEXT_PUBLIC_STRIPE_PRO_PRICE_ID',
   'STRIPE_WEBHOOK_SECRET',
-];
-
-const optionalEnvVars = [
   'NEXT_PUBLIC_FIREBASE_API_KEY',
   'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
   'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
@@ -17,6 +14,13 @@ const optionalEnvVars = [
   'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
   'NEXT_PUBLIC_FIREBASE_APP_ID',
   'NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID'
+];
+
+const optionalEnvVars = [
+  'BING_API_KEY',
+  'OPENWEATHERMAP_API_KEY',
+  'ALPHA_VANTAGE_API_KEY',
+  'FINNHUB_API_KEY'
 ];
 
 console.log('🔍 Validating environment variables for Omniplex...\n');
@@ -60,7 +64,7 @@ if (missingOptional.length > 0) {
   missingOptional.forEach(varName => {
     console.log(`   - ${varName}`);
   });
-  console.log('\n📝 These will use fallback values from firebaseConfig.js');
+  console.log('\n📝 These APIs can be added later for additional features');
 }
 
 console.log('\n🚀 Ready for deployment!');

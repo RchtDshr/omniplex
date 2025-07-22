@@ -36,7 +36,7 @@ export default function PaymentFailedPage() {
 
         <div style={styles.testNotice}>
           <p>
-            <strong>💡 Using test mode?</strong> Make sure you're using the test card number: <code>4242 4242 4242 4242</code>
+            <strong>💡 Using test mode?</strong> Make sure you&apos;re using the test card number: <code>4242 4242 4242 4242</code>
           </p>
         </div>
       </div>

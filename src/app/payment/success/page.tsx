@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUserDetailsState, setSubscriptionState } from '@/store/authSlice';
@@ -24,32 +24,7 @@ export default function PaymentSuccessPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Add CSS for spinner animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    if (sessionId) {
-      fetchPaymentStatus();
-    } else {
-      setError('No session ID found');
-      setLoading(false);
-    }
-
-    return () => {
-      if (style.parentNode) {
-        style.parentNode.removeChild(style);
-      }
-    };
-  }, [sessionId]);
-
-  const fetchPaymentStatus = async () => {
+  const fetchPaymentStatus = useCallback(async () => {
     try {
       console.log('🔍 Fetching payment status for session:', sessionId);
       
@@ -89,21 +64,44 @@ export default function PaymentSuccessPage() {
               console.error('❌ Update subscription failed:', updateData);
             }
           } else {
-            console.error('❌ Update subscription API error:', updateData);
+            console.error('❌ Failed to update subscription:', updateData);
           }
-        } else {
-          console.warn('⚠️ No user details or session ID available');
         }
       } else {
-        setError(data.error || 'Failed to fetch payment status');
+        setError(data.message || 'Failed to fetch payment status');
       }
-    } catch (err: any) {
-      console.error('💥 Network error:', err);
-      setError('Network error occurred');
+    } catch (error) {
+      console.error('💥 Error fetching payment status:', error);
+      setError('An error occurred while fetching payment status');
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId, userDetails.uid, dispatch]);
+
+  useEffect(() => {
+    // Add CSS for spinner animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    if (sessionId) {
+      fetchPaymentStatus();
+    } else {
+      setError('No session ID found');
+      setLoading(false);
+    }
+
+    return () => {
+      if (style.parentNode) {
+        style.parentNode.removeChild(style);
+      }
+    };
+  }, [sessionId, fetchPaymentStatus]);
 
   if (loading) {
     return (
