@@ -5,13 +5,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 // Firebase Config
 export const firebaseConfig = {
-  apiKey: "AIzaSyCdYL6S0_45646qGH36vAI1NlZmQW_9mYw",
-  authDomain: "omniplex-46807.firebaseapp.com",
-  projectId: "omniplex-46807",
-  storageBucket: "omniplex-46807.firebasestorage.app",
-  messagingSenderId: "1082565764889",
-  appId: "1:1082565764889:web:1f0c9d1e79810fccb84788",
-  measurementId: "G-5WLZ0677JJ"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ,
 };
 
 const app = initializeApp(firebaseConfig);

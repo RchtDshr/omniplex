@@ -28,9 +28,14 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+.env.example
 
 # vercel
 .vercel
+
+# Firebase service account (if you add one)
+firebase-service-account.json
+serviceAccountKey.json
 
 # typescript
 *.tsbuildinfo
